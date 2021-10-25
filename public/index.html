@@ -1,0 +1,32 @@
+<body style="background: white; font-size: 48px;">
+    <!-- <meta http-equiv="refresh" content="1"> -->
+    <!-- this is the local webpage -->
+    <script src="qrious.min.js"></script>
+    <h3 id="h3" style="margin: 1px;">track title</h3>
+    <img id="qr" src="" style="margin: 5px;"/>
+    <script>
+        // check API and refresh page if song changed
+        let respjson, qr;
+        setInterval(function(){
+            fetch('./qrapi')
+                .then((resp) => resp.json())
+                .then(data => {
+                    // console.log(`data: `, data);
+                    if(respjson && respjson.trackfilename && (respjson.trackfilename == data.trackfilename)) {
+                        // same - no need to refresh
+                    } else {
+                        console.log(`setting respjson `, respjson, data);
+                        respjson = data;
+                        document.getElementById('h3').innerHTML = 'displaying qr for '+data.trackfilename;
+
+                        // document.getElementById('qr').src = data.lnurl;
+                        qr = new QRious({
+                            element: document.getElementById('qr'),
+                            value: data.lnurl,
+                            size: 300,
+                        });
+                    }
+                })
+        }, 1000);
+    </script>
+</body>

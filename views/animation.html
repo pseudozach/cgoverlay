@@ -1,0 +1,45 @@
+<body style="background: white; font-size: 48px;">
+    <!-- <meta http-equiv="refresh" content="1"> -->
+    <!-- this is the local webpage -->
+    <h3 id="h3" style="margin: 1px;">animation based on tip data</h3>
+    <img id="qr" src="" style="margin: 5px;"/>
+
+    <script>
+        var lnbitsinvoicekey = "<%= lnbitsinvoicekey %>";
+        var tipthreshold = "<%= tipthreshold %>";
+        console.log(`lnbitsinvoicekey ${lnbitsinvoicekey}`);
+        var starttime = new Date().getTime();
+
+        // use pipedream while demo.lnbits.com sse is not working!
+        const eventSource = new EventSource(
+            "https://sdk.m.pipedream.net/pipelines/p_q6Cz1d1/sse"
+        );
+
+        eventSource.addEventListener("lnbits-webhooks", function(e) {
+            console.log("New event from pipedream: ", e);
+            let eventtimestamp = e.lastEventId.split("-")[0];
+            if(eventtimestamp > starttime) {
+                console.log(`lnbits webhook data: `, e.data);
+                let receivedamount = JSON.parse(e.data).amount/1000;
+                document.getElementById('h3').innerHTML = 'Received tip: ' + receivedamount;
+                if(receivedamount > tipthreshold) {
+                    document.getElementById('qr').src = 'rocket.gif'
+                } else {
+                    // small tip
+                    document.getElementById('qr').src = 'bitcoin.gif'
+                }
+            }
+        });
+
+    //   const es = new EventSource(
+    //     'https://demo.lnbits.com/api/v1/payments/sse?api-key='+lnbitsinvoicekey
+    //   )
+    //   es.addEventListener('payment-received', ev => {
+    //     const payment = JSON.parse(ev.data)
+    //     // var linkId = (parseInt(payment.extra.link)).toString()
+    //     console.log("got sse: ", payment)
+
+    //     // `Payment received for ${payment.memo}`
+    //   })
+    </script>
+</body>
